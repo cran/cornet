@@ -1,0 +1,33 @@
+---
+title: Combined Regression
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+Install the current release from [CRAN](https://CRAN.R-project.org/package=cornet):
+
+```{r,eval=FALSE}
+install.packages("cornet")
+```
+
+or the latest development version from [GitHub](https://github.com/rauschenberger/cornet):
+
+```{r,eval=FALSE}
+#install.packages("devtools")
+devtools::install_github("rauschenberger/cornet")
+```
+
+Armin Rauschenberger and Enrico Glaab (2019).
+"Lasso and ridge regression for dichotomised outcomes".
+*Manuscript in preparation.*
