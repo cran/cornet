@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -17,7 +18,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
@@ -79,7 +80,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -267,6 +290,9 @@ code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
+
+
+
 </head>
 
 <body>
@@ -278,16 +304,136 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<div id="installation" class="section level2">
-<h2>Installation</h2>
+<div id="installation" class="section level1">
+<h1>Installation</h1>
 <p>Install the current release from <a href="https://CRAN.R-project.org/package=cornet">CRAN</a>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;cornet&quot;</span>)</a></code></pre></div>
-<p>or the latest development version from <a href="https://github.com/rauschenberger/cornet">GitHub</a>:</p>
+<p>Or install the development version from <a href="https://github.com/rauschenberger/cornet">GitHub</a>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">#install.packages(&quot;devtools&quot;)</span></a>
 <a class="sourceLine" id="cb2-2" title="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rauschenberger/cornet&quot;</span>)</a></code></pre></div>
-<p>Armin Rauschenberger and Enrico Glaab (2019). “Lasso and ridge regression for dichotomised outcomes”. <em>Manuscript in preparation.</em></p>
+<p>Then load and attach the package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(cornet)</a></code></pre></div>
+</div>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<p>Here we analyse the data from Pinho et al. (2016), available under the Gene Expression Omnibus (<a href="https://www.ncbi.nlm.nih.gov/geo/">GEO</a>) accession number <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE80599">GSE80599</a>. Our aim is to predict disease progression from gene expression.</p>
+<p>The ordinal outcome <span class="math inline">\(\boldsymbol{y}\)</span> (MDS-UPDRS item 3.12, postural instability) ranges from <span class="math inline">\(0\)</span> (normal) to <span class="math inline">\(4\)</span> (severe), but Pinho et al. (2016) model the binary outcome <span class="math inline">\(\boldsymbol{z}=\mathbb{I}(\boldsymbol{y} \geq 1)\)</span>, which indicates slow <span class="math inline">\((0)\)</span> or rapid <span class="math inline">\((1)\)</span> progression.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>We use the Bioconductor packages <a href="https://doi.org/10.18129/B9.bioc.GEOquery"><code>GEOquery</code></a> and <a href="https://doi.org/10.18129/B9.bioc.Biobase"><code>Biobase</code></a> for obtaining the data <span class="math inline">\((\approx 150\)</span>MB<span class="math inline">\()\)</span>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co">#install.packages(&quot;BiocManager&quot;)</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">#BiocManager::install(c(&quot;GEOquery&quot;,&quot;Biobase&quot;))</span></a>
+<a class="sourceLine" id="cb4-3" title="3">data &lt;-<span class="st"> </span>GEOquery<span class="op">::</span><span class="kw">getGEO</span>(<span class="dt">GEO=</span><span class="st">&quot;GSE80599&quot;</span>)[[<span class="dv">1</span>]]</a>
+<a class="sourceLine" id="cb4-4" title="4">pheno &lt;-<span class="st"> </span>Biobase<span class="op">::</span><span class="kw">pData</span>(data)</a>
+<a class="sourceLine" id="cb4-5" title="5">y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(pheno<span class="op">$</span><span class="st">`</span><span class="dt">updrs-mds3.12 score:ch1</span><span class="st">`</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6">age &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(pheno<span class="op">$</span><span class="st">`</span><span class="dt">age at examination (years):ch1</span><span class="st">`</span>)</a>
+<a class="sourceLine" id="cb4-7" title="7">gender &lt;-<span class="st"> </span><span class="kw">ifelse</span>(pheno<span class="op">$</span><span class="st">`</span><span class="dt">gender:ch1</span><span class="st">`</span><span class="op">==</span><span class="st">&quot;Female&quot;</span>,<span class="dv">1</span>,<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-8" title="8">X &lt;-<span class="st"> </span><span class="kw">cbind</span>(age,gender,<span class="kw">t</span>(Biobase<span class="op">::</span><span class="kw">exprs</span>(data)))</a></code></pre></div>
+<p>The vector <span class="math inline">\(\boldsymbol{y}\)</span> of length <span class="math inline">\(n\)</span> represents the outcome, and the matrix <span class="math inline">\(\boldsymbol{X}\)</span> with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns represents the features. The first two columns include demographic variables (age, gender), and the other columns include the gene expression data.</p>
+</div>
+<div id="filter" class="section level2">
+<h2>Filter</h2>
+<p>We test for marginal association between the ordinal outcome and the features. The smallest adjusted <span class="math inline">\(p\)</span>-values is insignificant, and the <span class="math inline">\(p\)</span>-value distribution is not right-skewed. There is probably not much signal in the data.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">pvalue &lt;-<span class="st"> </span><span class="kw">apply</span>(X,<span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">cor.test</span>(x,y)<span class="op">$</span>p.value)</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw">min</span>(<span class="kw">p.adjust</span>(pvalue))</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="kw">hist</span>(pvalue)</a></code></pre></div>
+<p>We filter the features to artificially increase the signal-to-noise ratio. This filtering leads to <em>bias</em> and <em>overfitting</em>, and must not be done in practical applications!</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">cor &lt;-<span class="st"> </span><span class="kw">abs</span>(<span class="kw">cor</span>(y,X,<span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>))</a>
+<a class="sourceLine" id="cb6-2" title="2">X &lt;-<span class="st"> </span>X[,cor<span class="op">&gt;</span><span class="fl">0.3</span>] <span class="co"># forbidden!</span></a></code></pre></div>
+<!-- Pearson correlation test is equivalent to $t$-test in simple regression -->
+</div>
+<div id="model" class="section level2">
+<h2>Model</h2>
+<p>We use the function <code>cornet</code> for modelling the artifial binary outcome. The argument <code>cutoff</code> splits the samples into two groups, those with an outcome less than or equal to the cutoff, and those with an outcome greater than the cutoff.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">model &lt;-<span class="st"> </span><span class="kw">cornet</span>(<span class="dt">y=</span>y,<span class="dt">cutoff=</span><span class="dv">0</span>,<span class="dt">X=</span>X)</a>
+<a class="sourceLine" id="cb7-2" title="2">model</a></code></pre></div>
+<p>The function <code>coef</code> returns the estimated coefficients. The first column is for the linear model (beta), and the second column is for the logistic model (gamma). The first row includes the estimated intercepts, and the other rows include the estimated slopes.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">coef &lt;-<span class="st"> </span><span class="kw">coef</span>(model)</a></code></pre></div>
+<p>The function <code>predict</code> returns fitted values for training data, or predicted values for testing data. The argument <code>newx</code> specifies the feature matrix. The output is a matrix with one column for each model.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">predict &lt;-<span class="st"> </span><span class="kw">predict</span>(model,<span class="dt">newx=</span>X)</a></code></pre></div>
+<p>The function <code>cv.cornet</code> measures the predictive performance of combined regression by nested cross-validation, in comparison with logistic regression.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">cv.cornet</span>(<span class="dt">y=</span>y,<span class="dt">cutoff=</span><span class="dv">0</span>,<span class="dt">X=</span>X)</a></code></pre></div>
+<p>Here we observe that combined regression outperforms logistic regression (lower logistic deviance). Logistic regression is only slightly better than the intercept-only model.</p>
+</div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Pinho R, Guedes LC, Soreq L, Lobo PP, Mestre T, Coelho M, et al. (2016). “Gene Expression Differences in Peripheral Blood of Parkinson’s Disease Patients with Distinct Progression Profiles”. <em>PLoS ONE</em> 11(6):e0157852. <a href="https://doi.org/10.1371/journal.pone.0157852">doi:10.1371/journal.pone.0157852</a></p>
+<p>Rauschenberger A, and Glaab E (2019). “Predicting artificial binary outcomes from high-dimensional data”. <em>Manuscript in preparation.</em></p>
+<!--
+# Cognitive impairment
+
+Rani et al. (2017): GSE97644
+
+
+```r
+#install.packages("BiocManager")
+#BiocManager::install("GEOquery")
+files <- GEOquery::getGEOSuppFiles("GSE97644")
+pheno <- read.csv(textConnection(readLines(rownames(files)[1])))
+y <- pheno$MOCA.Score
+gender <- ifelse(pheno$Gender=="Female",1,0)
+age <- pheno$Age
+geno <- t(read.csv(textConnection(readLines(rownames(files)[2])),row.names=1))
+X <- cbind(gender,age,geno)
+```
+
+
+```r
+net <- cornet::cornet(y=y,cutoff=25,X=X)
+set.seed(1)
+cornet:::cv.cornet(y=y,cutoff=25,X=X)
+```
+
+# Other
+
+
+```r
+files <- GEOquery::getGEOSuppFiles("GSE95640")
+X <- t(read.csv(textConnection(readLines(rownames(files)[1])),row.names=1))
+y <- GEOquery::getGEO(GEO="GSE95640")[[1]] # no numeric outcome
+```
+
+
+```r
+data <- GEOquery::getGEO(GEO="GSE109597")[[1]]
+y <- as.numeric(Biobase::pData(data)$"bmi:ch1")
+X <- t(Biobase::exprs(data))
+cornet:::cv.cornet(y=y,cutoff=25,X=X,alpha=0)
+```
+
+Rani A, O'Shea A, Ianov L, Cohen RA et al. (2017). "miRNA in Circulating Microvesicles as Biomarkers for Age-Related Cognitive Decline". Frontiers in Aging Neuroscience 9:323. [doi:10.3389/fnagi.2017.00323](https://doi.org/10.3389/fnagi.2017.00323)
+-->
+<!--
+$(\hat{\boldsymbol{\beta}})$
+$(\hat{\boldsymbol{\gamma}})$
+$(\hat{\beta}_0$ and $\hat{\gamma}_0)$
+$(\hat{\beta}_j$ and $\hat{\gamma}_j$ $\forall j \in \{1,\ldots,p\})$
+
+### Example ###
+
+```r
+#install.packages("BiocManager")
+#BiocManager::install("mixOmics")
+set.seed(1)
+data(liver.toxicity,package="mixOmics")
+X <- as.matrix(liver.toxicity$gene)
+Y <- liver.toxicity$clinic
+cornet <- cornet::cornet(y=Y$BUN.mg.dL.,cutoff=15,X=X)
+cornet:::cv.cornet(y=Y$BUN.mg.dL.,cutoff=15,X=X)
+
+loss <- list()
+for(i in seq_along(Y)){
+  loss[[i]] <- cornet:::cv.cornet(y=Y[[i]],cutoff=median(Y[[i]]),alpha=0,X=X)
+}
+sapply(loss,function(x) x$deviance)
+```
+-->
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
