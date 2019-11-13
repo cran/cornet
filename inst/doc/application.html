@@ -304,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<p>This script requires that the working directory includes the folders “data”, “results”, and “manuscript”, with the files “PPMI_Baseline_Data_02Jul2018.csv”, “PPMI_Year_1-3_Data_02Jul2018.csv” and “PPMI_Data_Dictionary_for_Baseline_Dataset_Jul2018.csv” in the folder “data”.</p>
+<p>This script requires that the working directory includes the folders “data”, “results”, and “manuscript”, with the files “PPMI_Baseline_Data_02Jul2018.csv”, “PPMI_Year_1-3_Data_02Jul2018.csv” and “PPMI_Data_Dictionary_for_Baseline_Dataset_Jul2018.csv” in the folder “data”. We obtained our results using R 3.6.1 (2019-07-05) with cornet 0.0.3 (2019-10-02) on a local machine (x86_64-w64-mingw32/x64, Windows 10 x64).</p>
 <div id="processing" class="section level1">
 <h1>Processing</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># features</span></a>
@@ -436,9 +436,10 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb4-5" title="5">sum<span class="op">$</span>pi.min &lt;-<span class="st"> </span><span class="kw">sapply</span>(fit,<span class="cf">function</span>(x) x<span class="op">$</span>lasso1<span class="op">$</span>pi.min)</a>
 <a class="sourceLine" id="cb4-6" title="6"></a>
 <a class="sourceLine" id="cb4-7" title="7">grDevices<span class="op">::</span><span class="kw">pdf</span>(<span class="st">&quot;manuscript/figure_MAP.pdf&quot;</span>,<span class="dt">width=</span><span class="dv">4</span>,<span class="dt">height=</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb4-8" title="8">graphics<span class="op">::</span><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>))</a>
-<a class="sourceLine" id="cb4-9" title="9">cornet<span class="op">:::</span><span class="kw">plot.cornet</span>(sum)</a>
-<a class="sourceLine" id="cb4-10" title="10">grDevices<span class="op">::</span><span class="kw">dev.off</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">#grDevices::postscript(&quot;manuscript/figure_MAP.eps&quot;,horizontal=FALSE,onefile=FALSE,paper=&quot;special&quot;,width=4,height=3)</span></a>
+<a class="sourceLine" id="cb4-9" title="9">graphics<span class="op">::</span><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb4-10" title="10">cornet<span class="op">:::</span><span class="kw">plot.cornet</span>(sum)</a>
+<a class="sourceLine" id="cb4-11" title="11">grDevices<span class="op">::</span><span class="kw">dev.off</span>()</a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">ls</span>())</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="co">#load(&quot;results/application.RData&quot;,verbose=TRUE)</span></a>
 <a class="sourceLine" id="cb5-3" title="3"><span class="co">#sigma.min &lt;- sapply(fit,function(x) x$lasso1$sigma.min)</span></a>
@@ -450,27 +451,28 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb5-9" title="9">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from=</span><span class="dv">20</span>,<span class="dt">to=</span><span class="dv">30</span>,<span class="dt">length.out=</span><span class="dv">100</span>)</a>
 <a class="sourceLine" id="cb5-10" title="10"></a>
 <a class="sourceLine" id="cb5-11" title="11">grDevices<span class="op">::</span><span class="kw">pdf</span>(<span class="st">&quot;manuscript/figure_TFN.pdf&quot;</span>,<span class="dt">width=</span><span class="dv">4</span>,<span class="dt">height=</span><span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb5-12" title="12">graphics<span class="op">::</span><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>))</a>
-<a class="sourceLine" id="cb5-13" title="13">graphics<span class="op">::</span><span class="kw">plot.new</span>()</a>
-<a class="sourceLine" id="cb5-14" title="14">graphics<span class="op">::</span><span class="kw">plot.window</span>(<span class="dt">xlim=</span><span class="kw">range</span>(x),<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb5-15" title="15">graphics<span class="op">::</span><span class="kw">box</span>()</a>
-<a class="sourceLine" id="cb5-16" title="16">graphics<span class="op">::</span><span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb5-17" title="17">graphics<span class="op">::</span><span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb5-18" title="18">graphics<span class="op">::</span><span class="kw">title</span>(<span class="dt">xlab=</span><span class="kw">expression</span>(<span class="kw">hat</span>(y)),<span class="dt">ylab=</span><span class="kw">expression</span>(<span class="kw">Phi</span>(<span class="kw">hat</span>(y),mu,sigma<span class="op">^</span><span class="dv">2</span>)),<span class="dt">line=</span><span class="fl">2.5</span>)</a>
-<a class="sourceLine" id="cb5-19" title="19">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">h=</span><span class="fl">0.5</span>,<span class="dt">lty=</span><span class="dv">2</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>)</a>
-<a class="sourceLine" id="cb5-20" title="20">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">v=</span>cutoff,<span class="dt">lty=</span><span class="dv">2</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>)</a>
-<a class="sourceLine" id="cb5-21" title="21"></a>
-<a class="sourceLine" id="cb5-22" title="22">lty &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>); lwd &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb5-23" title="23">lty &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;dashed&quot;</span>,<span class="st">&quot;solid&quot;</span>,<span class="st">&quot;dotted&quot;</span>)</a>
-<a class="sourceLine" id="cb5-24" title="24"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(sigma)){</a>
-<a class="sourceLine" id="cb5-25" title="25">  p &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">pnorm</span>(<span class="dt">q=</span>x,<span class="dt">mean=</span>cutoff,<span class="dt">sd=</span>sigma[i])</a>
-<a class="sourceLine" id="cb5-26" title="26">  graphics<span class="op">::</span><span class="kw">lines</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>p,<span class="dt">lty=</span>lty[i],<span class="dt">lwd=</span>lwd[i])</a>
-<a class="sourceLine" id="cb5-27" title="27">}</a>
-<a class="sourceLine" id="cb5-28" title="28"></a>
-<a class="sourceLine" id="cb5-29" title="29">graphics<span class="op">::</span><span class="kw">text</span>(<span class="dt">x=</span>cutoff,<span class="dt">y=</span><span class="fl">0.40</span>,<span class="dt">labels=</span><span class="kw">bquote</span>(mu<span class="op">==</span>.(cutoff)),<span class="dt">pos=</span><span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb5-30" title="30">legend &lt;-<span class="st"> </span><span class="kw">sapply</span>(sigma,<span class="cf">function</span>(x) <span class="kw">as.expression</span>(<span class="kw">bquote</span>(sigma <span class="op">==</span><span class="st"> </span>.(x))))</a>
-<a class="sourceLine" id="cb5-31" title="31">graphics<span class="op">::</span><span class="kw">legend</span>(<span class="dt">x=</span><span class="st">&quot;topleft&quot;</span>,<span class="dt">legend=</span>legend,<span class="dt">lty=</span>lty,<span class="dt">bty=</span><span class="st">&quot;n&quot;</span>,<span class="dt">lwd=</span>lwd)</a>
-<a class="sourceLine" id="cb5-32" title="32">grDevices<span class="op">::</span><span class="kw">dev.off</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co">#grDevices::postscript(&quot;manuscript/figure_TFN.eps&quot;,horizontal=FALSE,onefile=FALSE,paper=&quot;special&quot;,width=4,height=3)</span></a>
+<a class="sourceLine" id="cb5-13" title="13">graphics<span class="op">::</span><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>))</a>
+<a class="sourceLine" id="cb5-14" title="14">graphics<span class="op">::</span><span class="kw">plot.new</span>()</a>
+<a class="sourceLine" id="cb5-15" title="15">graphics<span class="op">::</span><span class="kw">plot.window</span>(<span class="dt">xlim=</span><span class="kw">range</span>(x),<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb5-16" title="16">graphics<span class="op">::</span><span class="kw">box</span>()</a>
+<a class="sourceLine" id="cb5-17" title="17">graphics<span class="op">::</span><span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb5-18" title="18">graphics<span class="op">::</span><span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-19" title="19">graphics<span class="op">::</span><span class="kw">title</span>(<span class="dt">xlab=</span><span class="kw">expression</span>(<span class="kw">hat</span>(y)),<span class="dt">ylab=</span><span class="kw">expression</span>(<span class="kw">Phi</span>(<span class="kw">hat</span>(y),mu,sigma<span class="op">^</span><span class="dv">2</span>)),<span class="dt">line=</span><span class="fl">2.5</span>)</a>
+<a class="sourceLine" id="cb5-20" title="20">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">h=</span><span class="fl">0.5</span>,<span class="dt">lty=</span><span class="dv">2</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>)</a>
+<a class="sourceLine" id="cb5-21" title="21">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">v=</span>cutoff,<span class="dt">lty=</span><span class="dv">2</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>)</a>
+<a class="sourceLine" id="cb5-22" title="22"></a>
+<a class="sourceLine" id="cb5-23" title="23">lty &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>); lwd &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb5-24" title="24">lty &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;dashed&quot;</span>,<span class="st">&quot;solid&quot;</span>,<span class="st">&quot;dotted&quot;</span>)</a>
+<a class="sourceLine" id="cb5-25" title="25"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(sigma)){</a>
+<a class="sourceLine" id="cb5-26" title="26">  p &lt;-<span class="st"> </span>stats<span class="op">::</span><span class="kw">pnorm</span>(<span class="dt">q=</span>x,<span class="dt">mean=</span>cutoff,<span class="dt">sd=</span>sigma[i])</a>
+<a class="sourceLine" id="cb5-27" title="27">  graphics<span class="op">::</span><span class="kw">lines</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>p,<span class="dt">lty=</span>lty[i],<span class="dt">lwd=</span>lwd[i])</a>
+<a class="sourceLine" id="cb5-28" title="28">}</a>
+<a class="sourceLine" id="cb5-29" title="29"></a>
+<a class="sourceLine" id="cb5-30" title="30">graphics<span class="op">::</span><span class="kw">text</span>(<span class="dt">x=</span>cutoff,<span class="dt">y=</span><span class="fl">0.40</span>,<span class="dt">labels=</span><span class="kw">bquote</span>(mu<span class="op">==</span>.(cutoff)),<span class="dt">pos=</span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb5-31" title="31">legend &lt;-<span class="st"> </span><span class="kw">sapply</span>(sigma,<span class="cf">function</span>(x) <span class="kw">as.expression</span>(<span class="kw">bquote</span>(sigma <span class="op">==</span><span class="st"> </span>.(x))))</a>
+<a class="sourceLine" id="cb5-32" title="32">graphics<span class="op">::</span><span class="kw">legend</span>(<span class="dt">x=</span><span class="st">&quot;topleft&quot;</span>,<span class="dt">legend=</span>legend,<span class="dt">lty=</span>lty,<span class="dt">bty=</span><span class="st">&quot;n&quot;</span>,<span class="dt">lwd=</span>lwd)</a>
+<a class="sourceLine" id="cb5-33" title="33">grDevices<span class="op">::</span><span class="kw">dev.off</span>()</a></code></pre></div>
 </div>
 
 

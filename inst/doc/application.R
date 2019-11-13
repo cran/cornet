@@ -1,8 +1,8 @@
 ## ----setup, include=FALSE------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
-#setwd("") # adapt!
+#setwd("C:/Users/armin.rauschenberger/Desktop/cornet") # local drive
+#setwd("Z:/Rauschenberger/cornet/BIOINF_20XX-XX-XX") # shared drive
 #utils::install.packages(pkgs=c("devtools","missRanger","xtable"))
-#devtools::install_github("rauschenberger/palasso")
 #devtools::install_github("rauschenberger/cornet")
 
 ## ----process-------------------------------------------------------------
@@ -132,6 +132,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  sum$pi.min <- sapply(fit,function(x) x$lasso1$pi.min)
 #  
 #  grDevices::pdf("manuscript/figure_MAP.pdf",width=4,height=3)
+#  #grDevices::postscript("manuscript/figure_MAP.eps",horizontal=FALSE,onefile=FALSE,paper="special",width=4,height=3)
 #  graphics::par(mar=c(4,4,0.5,0.5))
 #  cornet:::plot.cornet(sum)
 #  grDevices::dev.off()
@@ -148,6 +149,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  x <- seq(from=20,to=30,length.out=100)
 #  
 #  grDevices::pdf("manuscript/figure_TFN.pdf",width=4,height=3)
+#  #grDevices::postscript("manuscript/figure_TFN.eps",horizontal=FALSE,onefile=FALSE,paper="special",width=4,height=3)
 #  graphics::par(mar=c(4,4,0.5,0.5))
 #  graphics::plot.new()
 #  graphics::plot.window(xlim=range(x),ylim=c(0,1))

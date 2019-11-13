@@ -328,10 +328,12 @@ coef.cornet <- function(object,...){
   if(length(list(...))!=0){warning("Ignoring arguments.")}
   
   s <- object$gaussian$lambda.min
-  beta <- glmnet::coef.glmnet(object=object$gaussian,s=s)
+  #beta <- glmnet::coef.glmnet(object=object$gaussian,s=s)
+  beta <- stats::coef(object=object$gaussian,s=s)
   
   s <- object$binomial$lambda.min
-  gamma <- glmnet::coef.glmnet(object=object$binomial,s=s)
+  #gamma <- glmnet::coef.glmnet(object=object$binomial,s=s)
+  gamma <- stats::coef(object=object$binomial,s=s)
   
   coef <- cbind(beta,gamma)
   colnames(coef) <- c("beta","gamma")
@@ -674,12 +676,12 @@ predict.cornet <- function(object,newx,type="probability",...){
 #' \code{\link[cornet]{cornet}} or \code{\link[glmnet]{glmnet}}
 #' 
 #' @examples
-#' \dontshow{n <- 100; p <- 20
-#' y <- rnorm(n)
-#' X <- matrix(rnorm(n*p),nrow=n,ncol=p)
-#' loss <- cv.cornet(y=y,cutoff=0,X=X,nfolds.ext=2)
-#' loss}
-#' \donttest{n <- 100; p <- 200
+#' \dontshow{#n <- 50; p <- 20
+#' #y <- rnorm(n)
+#' #X <- matrix(rnorm(n*p),nrow=n,ncol=p)
+#' #loss <- cv.cornet(y=y,cutoff=0,X=X,nfolds.ext=2)
+#' #loss}
+#' \dontrun{n <- 100; p <- 200
 #' y <- rnorm(n)
 #' X <- matrix(rnorm(n*p),nrow=n,ncol=p)
 #' loss <- cv.cornet(y=y,cutoff=0,X=X)
@@ -749,6 +751,8 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   #                                                paired=TRUE,alternative="greater")$p.value
   #   }
   # }
+  
+  loss <- lapply(loss,function(x) signif(x,digits=6)) # trial stability
   
   return(loss)
   
@@ -863,15 +867,22 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   Sigma <- matrix(data = NA, nrow = p, ncol = p)
   Sigma <- cor^abs(row(Sigma) - col(Sigma))
   diag(Sigma) <- 1
-
-  if (requireNamespace("MASS", quietly = TRUE)) {
-      X <- MASS::mvrnorm(n = n, mu = mu, Sigma = Sigma)
+  
+  #warning("DEACTIVE THIS!")
+  #Sigma <- round(Sigma,digits=5)
+  #X <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = Sigma,method = "chol")
+  #X <- round(X,digits=5)
+  
+  #if (requireNamespace("MASS", quietly = TRUE)) {
+  #    X <- MASS::mvrnorm(n = n, mu = mu, Sigma = Sigma) # not reproducible
+  if (requireNamespace("mvtnorm", quietly = TRUE)) {
+      X <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = Sigma)    
   } else {
-      if(cor!=0){stop("Correlation requires R package MASS!",call.=FALSE)}
+      if(cor!=0){stop("Correlation requires R package mvtnorm!",call.=FALSE)}
       X <- vapply(X = mu, FUN = function(x) stats::rnorm(n = n,mean = x),
                   FUN.VALUE = numeric(n))
-  }  
-    
+  }
+  
   beta <- stats::rbinom(n = p,size = 1, prob = prob)
   mean <- X %*% beta
   y <- stats::rnorm(n = n, mean = mean, sd = sd)
@@ -880,6 +891,8 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   cutoff <- stats::quantile(y,probs=frac)
   
   list <- list(y = y, X = X, cutoff = cutoff)
+  list <- lapply(list,function(x) signif(x,digits=6)) # trial stability
+  # or use signif?
   return(invisible(list))
 }
 

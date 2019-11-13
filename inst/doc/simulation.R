@@ -1,6 +1,7 @@
 ## ----setup,include=FALSE-------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
-#setwd("") # adapt!
+#setwd("C:/Users/armin.rauschenberger/Desktop/cornet") # local drive
+#setwd("Z:/Rauschenberger/cornet/BIOINF_20XX-XX-XX") # shared drive
 #devtools::install_github("rauschenberger/cornet")
 
 ## ----analysis------------------------------------------------------------
@@ -61,6 +62,9 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  
 #  sapply(fuse1,function(x) mean(x<0)) # lasso
 #  sapply(fuse0,function(x) mean(x<0)) # ridge
+#  
+#  sapply(fuse1,function(x) mean(x==0)) # lasso
+#  sapply(fuse0,function(x) mean(x==0)) # ridge
 
 ## ----figure_TAB----------------------------------------------------------
 #  #--- plot of percentage changes ---
