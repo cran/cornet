@@ -12,6 +12,26 @@ knitr::opts_chunk$set(echo = TRUE)
 library(cornet)
 
 ## ----eval=FALSE----------------------------------------------------------
+#  set.seed(1)
+#  n <- 100; p <- 500
+#  X <- matrix(rnorm(n*p),nrow=n,ncol=p)
+#  beta <- rbinom(n=p,size=1,prob=0.05)
+#  y <- rnorm(n=n,mean=X%*%beta)
+
+## ----eval=FALSE----------------------------------------------------------
+#  model <- cornet(y=y,cutoff=0,X=X)
+#  model
+
+## ----eval=FALSE----------------------------------------------------------
+#  coef <- coef(model)
+
+## ----eval=FALSE----------------------------------------------------------
+#  predict <- predict(model,newx=X)
+
+## ----eval=FALSE----------------------------------------------------------
+#  cv.cornet(y=y,cutoff=0,X=X)
+
+## ----eval=FALSE----------------------------------------------------------
 #  #install.packages("BiocManager")
 #  #BiocManager::install(c("GEOquery","Biobase"))
 #  data <- GEOquery::getGEO(GEO="GSE80599")[[1]]
@@ -29,19 +49,6 @@ library(cornet)
 ## ----eval=FALSE----------------------------------------------------------
 #  cor <- abs(cor(y,X,method="spearman"))
 #  X <- X[,cor>0.3] # forbidden!
-
-## ----eval=FALSE----------------------------------------------------------
-#  model <- cornet(y=y,cutoff=0,X=X)
-#  model
-
-## ----eval=FALSE----------------------------------------------------------
-#  coef <- coef(model)
-
-## ----eval=FALSE----------------------------------------------------------
-#  predict <- predict(model,newx=X)
-
-## ----eval=FALSE----------------------------------------------------------
-#  cv.cornet(y=y,cutoff=0,X=X)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  #install.packages("BiocManager")

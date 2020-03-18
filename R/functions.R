@@ -96,8 +96,8 @@
 #' \code{\link[=predict.cornet]{predict}}.
 #' 
 #' @references 
-#' Armin Rauschenberger and Enrico Glaab (2019).
-#' "Lasso and ridge regression for dichotomised outcomes".
+#' Armin Rauschenberger and Enrico Glaab (2020).
+#' "Predicting artificial binary outcomes from high-dimensional data".
 #' \emph{Manuscript in preparation}.
 #' 
 #' @examples
@@ -379,11 +379,12 @@ plot.cornet <- function(x,...){
   
   # colours
   if("RColorBrewer" %in% .packages(all.available=TRUE)){
-    pal <- rev(c("white",RColorBrewer::brewer.pal(n=9,name="Blues")))
+    pal <- rev(c("white",RColorBrewer::brewer.pal(n=9,name="Greys")))
     col <- grDevices::colorRampPalette(colors=pal)(k)
   } else {
     col <- grDevices::heat.colors(n=k)
   }
+  #col <- grDevices::grey(level=seq(from=0,to=1,length.out=k))
   
   nsigma <- length(x$sigma)
   npi <- length(x$pi)
