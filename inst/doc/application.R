@@ -1,11 +1,11 @@
-## ----setup, include=FALSE------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #setwd("C:/Users/armin.rauschenberger/Desktop/cornet") # local drive
-#setwd("Z:/Rauschenberger/cornet/BIOINF_20XX-XX-XX") # shared drive
+#setwd("Z:/Rauschenberger/cornet") # shared drive
 #utils::install.packages(pkgs=c("devtools","missRanger","xtable"))
 #devtools::install_github("rauschenberger/cornet")
 
-## ----process-------------------------------------------------------------
+## ----process------------------------------------------------------------------
 #  # features
 #  X <- read.csv("data/PPMI_Baseline_Data_02Jul2018.csv",row.names="PATNO",na.strings=c(".",""))
 #  X <- X[X$APPRDX==1,] # Parkinson's disease
@@ -40,7 +40,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  info <- gsub(pattern="&",replacement="\\\\&",x=info)
 #  cat(info)
 
-## ----analyse-------------------------------------------------------------
+## ----analyse------------------------------------------------------------------
 #  load("data/processed_data.RData",verbose=TRUE)
 #  
 #  colSums(!is.na(Y)) # sample size
@@ -74,7 +74,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
 #          sessioninfo::session_info()),con="results/info_app.txt")
 
-## ----compare-------------------------------------------------------------
+## ----compare------------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
 #  
 #  names <- c(paste0("lasso",1:3),paste0("ridge",1:3))
@@ -124,7 +124,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  xtable <- xtable::xtable(frame,digits=digits)
 #  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x)
 
-## ----figure_MAP----------------------------------------------------------
+## ----figure_MAP---------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
 #  sum <- fit[[1]]$lasso1
 #  sum$cvm <- Reduce("+",lapply(fit,function(x) x$lasso1$cvm))
@@ -137,7 +137,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  cornet:::plot.cornet(sum)
 #  grDevices::dev.off()
 
-## ----figure_TFN----------------------------------------------------------
+## ----figure_TFN---------------------------------------------------------------
 #  rm(list=ls())
 #  #load("results/application.RData",verbose=TRUE)
 #  #sigma.min <- sapply(fit,function(x) x$lasso1$sigma.min)
@@ -172,7 +172,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  graphics::legend(x="topleft",legend=legend,lty=lty,bty="n",lwd=lwd)
 #  grDevices::dev.off()
 
-## ----ordinal,eval=FALSE--------------------------------------------------
+## ----ordinal,eval=FALSE-------------------------------------------------------
 #  cv.cornet <- function (y, cutoff, X, alpha = 1, nfolds.ext = 5, nfolds.int = 10, foldid.ext = NULL, foldid.int = NULL, type.measure = "deviance", ordinal = FALSE,...) {
 #      z <- 1 * (y > cutoff)
 #      if (is.null(foldid.ext)) {

@@ -1,23 +1,38 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
 
 <title>reproducibility - simulation</title>
 
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
@@ -106,6 +121,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+
 <style type="text/css">body {
 background-color: #fff;
 margin: 1em auto;
@@ -116,9 +132,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -287,7 +300,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -304,7 +318,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<p>This script requires that the working directory includes the folders “data”, “results”, and “manuscript”. We obtained our results using R 3.6.1 (2019-07-05) with cornet 0.0.3 (2019-10-02) on a local machine (x86_64-w64-mingw32/x64, Windows 10 x64), and verified them on a virtual machine (x86_64-pc-linux-gnu, Ubuntu 16.04.6). Floating point errors might lead to slightly different results on other platforms.</p>
+<p>This script requires that the working directory includes the folders “data”, “results”, and “manuscript”. We obtained our results using R 4.0.0 (2020-04-24) with cornet 0.0.4 (2020-03-18) on a local machine (x86_64-w64-mingw32/x64, Windows 10 x64). Floating point errors might lead to slightly different results on other platforms.</p>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">iter &lt;-<span class="st"> </span><span class="dv">1000</span></a>
@@ -355,19 +369,25 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb2-18" title="18">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>,<span class="dt">lty=</span><span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb2-19" title="19">graphics<span class="op">::</span><span class="kw">abline</span>(<span class="dt">v=</span>at<span class="op">+</span><span class="dv">1</span>,<span class="dt">col=</span><span class="st">&quot;grey&quot;</span>,<span class="dt">lty=</span><span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb2-20" title="20">graphics<span class="op">::</span><span class="kw">box</span>()</a>
-<a class="sourceLine" id="cb2-21" title="21">graphics<span class="op">::</span><span class="kw">boxplot</span>(fuse1,<span class="dt">at=</span>at<span class="fl">-0.5</span>,<span class="dt">add=</span><span class="ot">TRUE</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,<span class="dt">border=</span><span class="st">&quot;black&quot;</span>)</a>
-<a class="sourceLine" id="cb2-22" title="22">graphics<span class="op">::</span><span class="kw">boxplot</span>(fuse0,<span class="dt">at=</span>at<span class="fl">+0.5</span>,<span class="dt">add=</span><span class="ot">TRUE</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,<span class="dt">border=</span><span class="st">&quot;darkgrey&quot;</span>)</a>
+<a class="sourceLine" id="cb2-21" title="21">graphics<span class="op">::</span><span class="kw">boxplot</span>(fuse1,<span class="dt">at=</span>at<span class="fl">-0.5</span>,<span class="dt">add=</span><span class="ot">TRUE</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,<span class="dt">col=</span><span class="st">&quot;white&quot;</span>,<span class="dt">border=</span><span class="st">&quot;black&quot;</span>)</a>
+<a class="sourceLine" id="cb2-22" title="22">graphics<span class="op">::</span><span class="kw">boxplot</span>(fuse0,<span class="dt">at=</span>at<span class="fl">+0.5</span>,<span class="dt">add=</span><span class="ot">TRUE</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,<span class="dt">col=</span><span class="st">&quot;white&quot;</span>,<span class="dt">border=</span><span class="st">&quot;darkgrey&quot;</span>)</a>
 <a class="sourceLine" id="cb2-23" title="23">labels &lt;-<span class="st"> </span><span class="kw">names</span>(fuse1)</a>
 <a class="sourceLine" id="cb2-24" title="24">labels &lt;-<span class="st"> </span><span class="kw">ifelse</span>(labels<span class="op">==</span><span class="st">&quot;class&quot;</span>,<span class="st">&quot;mcr&quot;</span>,labels)</a>
 <a class="sourceLine" id="cb2-25" title="25">labels &lt;-<span class="st"> </span><span class="kw">ifelse</span>(labels <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;mcr&quot;</span>,<span class="st">&quot;mse&quot;</span>,<span class="st">&quot;mae&quot;</span>,<span class="st">&quot;auc&quot;</span>),<span class="kw">toupper</span>(labels),labels)</a>
 <a class="sourceLine" id="cb2-26" title="26">graphics<span class="op">::</span><span class="kw">axis</span>(<span class="dt">side=</span><span class="dv">1</span>,<span class="dt">at=</span>at,<span class="dt">labels=</span>labels)</a>
 <a class="sourceLine" id="cb2-27" title="27">grDevices<span class="op">::</span><span class="kw">dev.off</span>()</a>
 <a class="sourceLine" id="cb2-28" title="28"></a>
-<a class="sourceLine" id="cb2-29" title="29"><span class="kw">sapply</span>(fuse1,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&lt;</span><span class="dv">0</span>)) <span class="co"># lasso</span></a>
-<a class="sourceLine" id="cb2-30" title="30"><span class="kw">sapply</span>(fuse0,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&lt;</span><span class="dv">0</span>)) <span class="co"># ridge</span></a>
-<a class="sourceLine" id="cb2-31" title="31"></a>
-<a class="sourceLine" id="cb2-32" title="32"><span class="kw">sapply</span>(fuse1,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">==</span><span class="dv">0</span>)) <span class="co"># lasso</span></a>
-<a class="sourceLine" id="cb2-33" title="33"><span class="kw">sapply</span>(fuse0,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">==</span><span class="dv">0</span>)) <span class="co"># ridge</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-29" title="29"><span class="co"># decrease</span></a>
+<a class="sourceLine" id="cb2-30" title="30"><span class="kw">sapply</span>(fuse1,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&lt;</span><span class="dv">0</span>)) <span class="co"># lasso</span></a>
+<a class="sourceLine" id="cb2-31" title="31"><span class="kw">sapply</span>(fuse0,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&lt;</span><span class="dv">0</span>)) <span class="co"># ridge</span></a>
+<a class="sourceLine" id="cb2-32" title="32"></a>
+<a class="sourceLine" id="cb2-33" title="33"><span class="co"># constant</span></a>
+<a class="sourceLine" id="cb2-34" title="34"><span class="kw">sapply</span>(fuse1,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">==</span><span class="dv">0</span>)) <span class="co"># lasso</span></a>
+<a class="sourceLine" id="cb2-35" title="35"><span class="kw">sapply</span>(fuse0,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">==</span><span class="dv">0</span>)) <span class="co"># ridge</span></a>
+<a class="sourceLine" id="cb2-36" title="36"></a>
+<a class="sourceLine" id="cb2-37" title="37"><span class="co"># increase</span></a>
+<a class="sourceLine" id="cb2-38" title="38"><span class="kw">sapply</span>(fuse1,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&gt;</span><span class="dv">0</span>)) <span class="co"># lasso</span></a>
+<a class="sourceLine" id="cb2-39" title="39"><span class="kw">sapply</span>(fuse0,<span class="cf">function</span>(x) <span class="kw">mean</span>(x<span class="op">&gt;</span><span class="dv">0</span>)) <span class="co"># ridge</span></a></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co">#--- plot of percentage changes ---</span></a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="kw">load</span>(<span class="st">&quot;results/simulation.RData&quot;</span>,<span class="dt">verbose=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb3-3" title="3"></a>

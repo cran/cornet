@@ -1,10 +1,10 @@
-## ----setup,include=FALSE-------------------------------------------------
+## ----setup,include=FALSE------------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #setwd("C:/Users/armin.rauschenberger/Desktop/cornet") # local drive
-#setwd("Z:/Rauschenberger/cornet/BIOINF_20XX-XX-XX") # shared drive
+#setwd("Z:/Rauschenberger/cornet") # shared drive
 #devtools::install_github("rauschenberger/cornet")
 
-## ----analysis------------------------------------------------------------
+## ----analysis-----------------------------------------------------------------
 #  iter <- 1000
 #  set.seed(1)
 #  frame <- data.frame(cor=runif(n=iter,min=0,max=0.9),
@@ -31,7 +31,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
 #          sessioninfo::session_info()),con="results/info_sim.txt")
 
-## ----figure_BOX----------------------------------------------------------
+## ----figure_BOX---------------------------------------------------------------
 #  #--- boxplot of different metrics ---
 #  load("results/simulation.RData",verbose=TRUE)
 #  
@@ -52,21 +52,27 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  graphics::abline(h=0,col="grey",lty=2)
 #  graphics::abline(v=at+1,col="grey",lty=2)
 #  graphics::box()
-#  graphics::boxplot(fuse1,at=at-0.5,add=TRUE,axes=FALSE,border="black")
-#  graphics::boxplot(fuse0,at=at+0.5,add=TRUE,axes=FALSE,border="darkgrey")
+#  graphics::boxplot(fuse1,at=at-0.5,add=TRUE,axes=FALSE,col="white",border="black")
+#  graphics::boxplot(fuse0,at=at+0.5,add=TRUE,axes=FALSE,col="white",border="darkgrey")
 #  labels <- names(fuse1)
 #  labels <- ifelse(labels=="class","mcr",labels)
 #  labels <- ifelse(labels %in% c("mcr","mse","mae","auc"),toupper(labels),labels)
 #  graphics::axis(side=1,at=at,labels=labels)
 #  grDevices::dev.off()
 #  
+#  # decrease
 #  sapply(fuse1,function(x) mean(x<0)) # lasso
 #  sapply(fuse0,function(x) mean(x<0)) # ridge
 #  
+#  # constant
 #  sapply(fuse1,function(x) mean(x==0)) # lasso
 #  sapply(fuse0,function(x) mean(x==0)) # ridge
+#  
+#  # increase
+#  sapply(fuse1,function(x) mean(x>0)) # lasso
+#  sapply(fuse0,function(x) mean(x>0)) # ridge
 
-## ----figure_TAB----------------------------------------------------------
+## ----figure_TAB---------------------------------------------------------------
 #  #--- plot of percentage changes ---
 #  load("results/simulation.RData",verbose=TRUE)
 #  
