@@ -1,7 +1,6 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
-#setwd("C:/Users/armin.rauschenberger/Desktop/cornet") # local drive
-#setwd("Z:/Rauschenberger/cornet") # shared drive
+#setwd("~/Desktop/cornet")
 #utils::install.packages(pkgs=c("devtools","missRanger","xtable"))
 #devtools::install_github("rauschenberger/cornet")
 
@@ -34,7 +33,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  rm(list=ls())
 #  info <- read.csv("data/PPMI_Data_Dictionary_for_Baseline_Dataset_Jul2018.csv",nrows=238)
 #  info <- info[!info$Variable %in% c("","PATNO","SITE","APPRDX","EVENT_ID","symptom5_comment"),]
-#  info <- paste(paste0("\\textit{",info$Variable,"}: ",info$Description),collapse="; ")
+#  info <- paste(paste0("\\item \\textit{",info$Variable,"}: ",info$Description),collapse=" ")
 #  info <- gsub(pattern=" \\(OFF\\)",replacement="",x=info)
 #  info <- gsub(pattern="_",replacement="\\_",x=info,fixed=TRUE)
 #  info <- gsub(pattern="&",replacement="\\\\&",x=info)
@@ -48,9 +47,9 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  
 #  # --- Cross-validating models. ---
 #  names <- paste0(rep(c("lasso","ridge"),each=3),seq_len(3)) # change to 3!
-#  loss <- fit <- pval <- list()
+#  loss <- fit <- p.log <- p.lin <- list()
 #  for(i in seq_along(x)){
-#    loss[[i]] <- fit[[i]] <- pval[[i]] <- list()
+#    loss[[i]] <- fit[[i]] <- p.log[[i]] <- p.lin[[i]] <- list()
 #      cat("i =",i,"\n")
 #      for(j in seq_along(names)){
 #        cat("j =",j," ")
@@ -65,17 +64,21 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #        fit[[i]][[names[j]]] <- cornet::cornet(y=y[cond],cutoff=25.5,
 #                                    X=x[[i]][cond,],alpha=alpha)
 #        set.seed(i)
-#        pval[[i]][[names[j]]] <- median(replicate(n=50,expr=cornet:::.test(y=y[cond],cutoff=25.5,X=x[[i]][cond,],alpha=alpha)))
+#        temp <- replicate(n=50,expr=cornet:::.test(y=y[cond],cutoff=25.5,X=x[[i]][cond,],alpha=alpha))
+#        p.log[[i]][[names[j]]] <- median(unlist(temp["log",]))
+#        p.lin[[i]][[names[j]]] <- median(unlist(temp["lin",]))
 #      }
 #      cat("\n")
 #  }
 #  
-#  save(loss,fit,pval,file="results/application.RData")
+#  save(loss,fit,p.log,p.lin,file="results/application.RData")
 #  writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
 #          sessioninfo::session_info()),con="results/info_app.txt")
 
-## ----compare------------------------------------------------------------------
+## ----table_pool---------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
+#  
+#  k <- "binomial"
 #  
 #  names <- c(paste0("lasso",1:3),paste0("ridge",1:3))
 #  frame <- data.frame(row.names=names)
@@ -83,19 +86,23 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  
 #    # deviance
 #    dev <- as.data.frame(t(sapply(loss,function(x) x[[i]]$deviance)))
-#    dec <- (dev$combined-dev$binomial)/dev$binomial
+#    dec <- (dev$combined-dev[[k]])/dev[[k]]
 #    # change in percent
 #    frame[i,"dev.min"] <- round(100*min(dec),digits=1)
 #    frame[i,"dev.max"] <- round(100*max(dec),digits=1)
 #  
 #    # proportion with improvement
-#    frame[i,"dev.num"] <- sum(dev$combined < dev$binomial)
+#    frame[i,"dev.num"] <- sum(dev$combined < dev[[k]])
 #  
 #    # significance based on multi-split
-#    pvalue <- sapply(pval,function(x) x[[i]])
-#    frame[i,"pval.min"] <- signif(min(pvalue),digits=2)
-#    frame[i,"pval.max"] <- signif(max(pvalue),digits=2)
-#    #frame[i,"pval.prop"] <- round(mean(pvalue<0.05),digits=2)
+#    if(k=="binomial"){
+#      pvalue <- sapply(p.log,function(x) x[[i]])
+#    }
+#    if(k=="gaussian"){
+#      pvalue <- sapply(p.lin,function(x) x[[i]])
+#    }
+#    frame[i,"pval.min"] <- round(min(pvalue),digits=3)
+#    frame[i,"pval.max"] <- round(max(pvalue),digits=3)
 #  
 #    # quantiles weight parameter
 #    q <- round(quantile(sapply(fit,function(x) x[[i]]$pi.min),probs=c(0,0.5,1)),digits=2)
@@ -111,7 +118,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  }
 #  
 #  # presentation
-#  
+#  frame <- format(frame)
 #  rownames(frame) <- paste0(substr(x=rownames(frame),start=1,stop=5)," ",
 #                            substr(x=rownames(frame),start=6,stop=6))
 #  colnames(frame) <- gsub(pattern="dev.",replacement="\\\\delta_{\\\\text{",x=colnames(frame))
@@ -120,9 +127,35 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  colnames(frame) <- gsub(pattern="sd.",replacement="\\\\sigma_{\\\\text{",x=colnames(frame))
 #  colnames(frame) <- paste0("$",colnames(frame),"}}$")
 #  
-#  digits <- 2+c(0,1*grepl(pattern="delta_|p_",x=colnames(frame))) # was "p_"
-#  xtable <- xtable::xtable(frame,digits=digits)
-#  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x)
+#  xtable <- xtable::xtable(frame,align="r|rrc|cc|ccc|ccc")
+#  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x,comment=FALSE)
+
+## ----table_other--------------------------------------------------------------
+#  load("results/application.RData",verbose=TRUE)
+#  
+#  names <- c(paste0("lasso",1:3),paste0("ridge",1:3))
+#  type <- c("deviance","class","mse","mae","auc")
+#  
+#  k <- "binomial"
+#  
+#  frame <- matrix(NA,nrow=length(names),ncol=length(type),dimnames=list(names,type))
+#  
+#  for(i in names){
+#    for(j in type){
+#      value <- as.data.frame(t(sapply(loss,function(x) x[[i]][[j]])))
+#      change <- 100*(value$combined-value[[k]])/value[[k]]
+#      frame[i,j] <- median(change)
+#    }
+#  }
+#  
+#  frame <- format(round(frame,digits=1))
+#  frame <- gsub(pattern=" ",replacement="+",x=frame)
+#  colnames(frame) <- sapply(colnames(frame),function(x) switch(x,class="\\textsc{mcr}",mse="\\textsc{mse}",mae="\\textsc{mae}",auc="\\textsc{auc}",x))
+#  colnames(frame) <- paste0("$\\Delta$",colnames(frame))
+#  rownames(frame) <- paste0(substr(x=rownames(frame),start=1,stop=5)," ",
+#                            substr(x=rownames(frame),start=6,stop=6))
+#  xtable <- xtable::xtable(frame,align="r|ccccc")
+#  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x,comment=FALSE)
 
 ## ----figure_MAP---------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
@@ -132,24 +165,20 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  sum$pi.min <- sapply(fit,function(x) x$lasso1$pi.min)
 #  
 #  grDevices::pdf("manuscript/figure_MAP.pdf",width=4,height=3)
-#  #grDevices::postscript("manuscript/figure_MAP.eps",horizontal=FALSE,onefile=FALSE,paper="special",width=4,height=3)
+#  
 #  graphics::par(mar=c(4,4,0.5,0.5))
 #  cornet:::plot.cornet(sum)
+#  
 #  grDevices::dev.off()
 
 ## ----figure_TFN---------------------------------------------------------------
 #  rm(list=ls())
-#  #load("results/application.RData",verbose=TRUE)
-#  #sigma.min <- sapply(fit,function(x) x$lasso1$sigma.min)
-#  #sigma.min <- sapply(fit,function(x) sapply(x,function(x) x$sigma.min))
-#  #sigma <- round(quantile(sigma.min,p=c(0,0.5,1)),digits=2)
-#  #cutoff <- unique(sapply(fit,function(x) x$lasso1$cutoff))
 #  
-#  sigma <- c(1,2,3); cutoff <- 25.5 # or actual values (see above)
+#  sigma <- c(1,2,3); cutoff <- 25.5
 #  x <- seq(from=20,to=30,length.out=100)
 #  
 #  grDevices::pdf("manuscript/figure_TFN.pdf",width=4,height=3)
-#  #grDevices::postscript("manuscript/figure_TFN.eps",horizontal=FALSE,onefile=FALSE,paper="special",width=4,height=3)
+#  
 #  graphics::par(mar=c(4,4,0.5,0.5))
 #  graphics::plot.new()
 #  graphics::plot.window(xlim=range(x),ylim=c(0,1))
@@ -170,6 +199,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  graphics::text(x=cutoff,y=0.40,labels=bquote(mu==.(cutoff)),pos=4)
 #  legend <- sapply(sigma,function(x) as.expression(bquote(sigma == .(x))))
 #  graphics::legend(x="topleft",legend=legend,lty=lty,bty="n",lwd=lwd)
+#  
 #  grDevices::dev.off()
 
 ## ----ordinal,eval=FALSE-------------------------------------------------------

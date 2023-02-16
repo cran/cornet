@@ -96,8 +96,8 @@
 #' \code{\link[=predict.cornet]{predict}}.
 #' 
 #' @references 
-#' Armin Rauschenberger and Enrico Glaab (2022).
-#' "Predicting artificial binary outcomes from high-dimensional data".
+#' Armin Rauschenberger and Enrico Glaab (2023).
+#' "Predicting artificial binary outcomes from high-dimensional data in biomedicine".
 #' \emph{Manuscript in preparation}.
 #' 
 #' @examples
@@ -110,9 +110,10 @@
 cornet <- function(y,cutoff,X,alpha=1,npi=101,pi=NULL,nsigma=99,sigma=NULL,nfolds=10,foldid=NULL,type.measure="deviance",...){
   
   #--- temporary ---
-  # cutoff <- 0; npi <- 101; pi <- NULL; nsigma <- 99; sigma <- NULL; nfolds <- 10;  foldid <- NULL; type.measure <- "deviance"; logistic <- TRUE
+  # alpha <- 1; cutoff <- 0; npi <- 101; pi <- NULL; nsigma <- 99; sigma <- NULL; nfolds <- 10;  foldid <- NULL; type.measure <- "deviance"; logistic <- TRUE
   test <- list()
   test$combined <- TRUE
+  test$switch <- TRUE
   
   #--- checks ---
   n <- length(y)
@@ -239,9 +240,20 @@ cornet <- function(y,cutoff,X,alpha=1,npi=101,pi=NULL,nsigma=99,sigma=NULL,nfold
     if(fit$cvm[names(fit$sigma.min),names(fit$pi.min)]!=min(fit$cvm)){stop("Internal error.")}
   }
   
+  if(test$switch){
+    fit$inf <- fit$cvm
+    fit$inf[,!fit$pi %in% c(0,1)] <- Inf
+    temp <- which(fit$inf==min(fit$inf),arr.ind=TRUE,useNames=TRUE)
+    if(nrow(temp)>1){message("Multiple minima.");temp <- temp[1,,drop=FALSE]}
+    fit$inf.sigma.min <- fit$sigma[temp[1]]
+    fit$inf.pi.min <- fit$pi[temp[2]]
+    if(fit$inf[names(fit$inf.sigma.min),names(fit$inf.pi.min)]!=min(fit$inf)){stop("Internal error.")}
+  }
+  
   #--- return ---
   fit$cutoff <- cutoff
   fit$info <- list(type.measure=type.measure,
+                   sd.min=fit$sigma[which.min(fit$cvm[,fit$pi==1])], # continuous only
                    sd.y=stats::sd(y),
                    "+"=sum(z==1),
                    "-"=sum(z==0),
@@ -475,7 +487,7 @@ predict.cornet <- function(object,newx,type="probability",...){
   # linear and logistic
   link <- as.numeric(stats::predict(object=x$gaussian,
                   newx=newx,s=x$gaussian$lambda.min,type="response"))
-  #prob$gaussian <- stats::pnorm(q=link,mean=x$cutoff,sd=x$info$sd.y) # was active
+  prob$gaussian <- stats::pnorm(q=link,mean=x$cutoff,sd=x$info$sd.min) # continuous only
   prob$binomial <- as.numeric(stats::predict(object=x$binomial,
                   newx=newx,s=x$binomial$lambda.min,type="response"))
   
@@ -483,6 +495,11 @@ predict.cornet <- function(object,newx,type="probability",...){
   if(test$combined){
     cont <- stats::pnorm(q=link,mean=x$cutoff,sd=x$sigma.min)
     prob$combined <- x$pi.min*cont + (1-x$pi.min)*prob$binomial
+  }
+  
+  if(test$switch){
+    cont <- stats::pnorm(q=link,mean=x$cutoff,sd=x$inf.sigma.min)
+    prob$switch <- x$inf.pi.min*cont + (1-x$inf.pi.min)*prob$binomial
   }
   
   # consistency tests
@@ -673,6 +690,14 @@ predict.cornet <- function(object,newx,type="probability",...){
 #' between \eqn{1} and \code{nfolds.int};
 #' or \code{NULL}
 #' 
+#' @param rf
+#' comparison with random forest\strong{:}
+#' logical
+#' 
+#' @param svm
+#' comparison with support vector machine\strong{:}
+#' logical
+#' 
 #' @param ... further arguments passed to
 #' \code{\link[cornet]{cornet}} or \code{\link[glmnet]{glmnet}}
 #' 
@@ -685,21 +710,33 @@ predict.cornet <- function(object,newx,type="probability",...){
 #' \dontrun{n <- 100; p <- 200
 #' y <- rnorm(n)
 #' X <- matrix(rnorm(n*p),nrow=n,ncol=p)
-#' loss <- cv.cornet(y=y,cutoff=0,X=X)
+#' loss <- cv.cornet(y=y,cutoff=0,X=X,rf=TRUE,svm=TRUE)
 #' loss}
 #' 
-cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=NULL,foldid.int=NULL,type.measure="deviance",...){
+cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=NULL,foldid.int=NULL,type.measure="deviance",rf=FALSE,svm=FALSE,...){
+  
+  if(rf){
+    if(!"randomForest" %in% rownames(utils::installed.packages())){
+      stop("Requires package 'randomForest'.")
+    }
+  }
+  
+  if(svm){
+    if(!"e1071" %in% rownames(utils::installed.packages())){
+      stop("Requires package 'e1071'.")
+    }
+  }
   
   z <- 1*(y > cutoff)
   if(is.null(foldid.ext)){
     foldid.ext <- palasso:::.folds(y=z,nfolds=nfolds.ext)
   } else {
-    nfolds.ext <- length(unique(foldid.ext))
+    nfolds.ext <- max(foldid.ext)
   }
   
   #--- cross-validated loss ---
   
-  cols <- c("intercept","binomial","combined") # was with "gaussian" and without "intercept"
+  cols <- c("intercept","binomial","gaussian","combined","switch","rf"[rf],"svm"[svm])
   pred <- matrix(data=NA,nrow=length(y),ncol=length(cols),
                  dimnames=list(NULL,cols))
   
@@ -716,7 +753,7 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
       foldid <- foldid.int[foldid.ext!=i]
     }
     
-    fit <- cornet::cornet(y=y0,cutoff=cutoff,X=X0,alpha=alpha,type.measure=type.measure,foldid=foldid,...)
+    fit <- cornet(y=y0,cutoff=cutoff,X=X0,alpha=alpha,type.measure=type.measure,foldid=foldid,...)
     tryCatch(expr=plot.cornet(fit),error=function(x) NULL)
     temp <- predict.cornet(fit,newx=X1)
     if(any(temp<0|temp>1)){stop("Outside unit interval.",call.=FALSE)}
@@ -724,10 +761,21 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
     for(j in seq_along(model)){
       pred[foldid.ext==i,model[j]] <- temp[[model[j]]]
     }
+    
+    if(rf){
+      object <- randomForest::randomForest(x=X0,y=as.factor(z0),norm.votes=TRUE)
+      pred[foldid.ext==i,"rf"] <- stats::predict(object,newdata=X1,type="prob")[,2]
+    }
+    
+    if(svm){
+      object <- e1071::svm(x=X0,y=as.factor(z0),probability=TRUE)
+      pred[foldid.ext==i,"svm"] <- attributes(stats::predict(object,newdata=X1,probability=TRUE))$probabilities[,2]
+    }
+    
   }
   
   type <- c("deviance","class","mse","mae","auc")
-  loss <- lapply(X=type,FUN=function(x) palasso:::.loss(y=z,fit=pred,family="binomial",type.measure=x,foldid=foldid.ext)[[1]])
+  loss <- lapply(X=type,FUN=function(x) palasso:::.loss(y=z[foldid.ext!=0],fit=pred[foldid.ext!=0,],family="binomial",type.measure=x,foldid=foldid.ext[foldid.ext!=0])[[1]])
   names(loss) <- type
   
   # if(FALSE){
@@ -789,7 +837,7 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   fold <- palasso:::.folds(y=z,nfolds=5)
   fold <- ifelse(fold==1,1,0)
   
-  fit <- cornet::cornet(y=y[fold==0],cutoff=cutoff,X=X[fold==0,],
+  fit <- cornet(y=y[fold==0],cutoff=cutoff,X=X[fold==0,],
                         alpha=alpha,type.measure=type.measure)
   tryCatch(expr=plot.cornet(fit),error=function(x) NULL)
   pred <- predict.cornet(fit,newx=X[fold==1,])
@@ -799,7 +847,11 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   pred[pred < limit] <- limit
   pred[pred > 1 - limit] <- 1 - limit
   res <- -2 * (z[fold==1] * log(pred) + (1 - z[fold==1]) * log(1 - pred))
-  pvalue <- stats::wilcox.test(x=res[,"binomial"],y=res[,"combined"],paired=TRUE,alternative="greater")$p.value
+  #pvalue <- stats::wilcox.test(x=res[,"binomial"],y=res[,"combined"],paired=TRUE,alternative="greater")$p.value
+  
+  pvalue <- list()
+  pvalue$log <- stats::wilcox.test(x=res[,"combined"],y=res[,"binomial"],paired=TRUE,alternative="less")$p.value
+  pvalue$lin <- stats::wilcox.test(x=res[,"combined"],y=res[,"gaussian"],paired=TRUE,alternative="less")$p.value
   
   ##equality logistic deviance
   #colMeans(res)
@@ -884,8 +936,16 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
                   FUN.VALUE = numeric(n))
   }
   
-  beta <- stats::rbinom(n = p,size = 1, prob = prob)
-  mean <- X %*% beta
+  beta <- stats::runif(n=p)*stats::rbinom(n = p,size = 1, prob = prob)
+  if(FALSE){ # non-linear effects
+    warning("temporary: non-linear effects")
+    lambda <- sample(x=c(0,0.5,1,2),replace=TRUE,prob=c(0.25,0.25,0.25,0.25),size=p)
+    tau <- sample(x=c(-2,-1,0,1,2),replace=TRUE,prob=c(0.2,0.2,0.2,0.2,0.2),size=p)
+    Z <- sign(X-tau)*abs(X-tau)^rep(lambda,each=n)
+  } else {
+    Z <- X
+  }
+  mean <- Z %*% beta
   y <- stats::rnorm(n = n, mean = mean, sd = sd)
   y <- sign(y) * abs(y)^exp # departure from normality
   
