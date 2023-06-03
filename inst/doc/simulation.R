@@ -1,7 +1,6 @@
 ## ----setup,include=FALSE------------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #setwd("~/Desktop/cornet")
-#utils::install.packages(pkgs=c("randomForest","e1071"))
 #devtools::install_github("rauschenberger/cornet")
 
 ## ----abstract-----------------------------------------------------------------
@@ -31,8 +30,8 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  
 #  graphics::text(x=0.4,y=0.55,labels="binary outcome:\nlogistic regression",col="red",cex=0.7,pos=3)
 #  graphics::text(x=0.4,y=0.45,labels="numerical outcome:\nlinear regression",col="blue",cex=0.7,pos=1)
-#  graphics::text(x=0.63,y=0.5,labels="combine\npredicted\nprobabilities",col="grey",cex=0.7)
-#  graphics::text(x=0.8,y=0.3,labels="transform\npredicted values to\npredicted probabilities",col="grey",cex=0.7,pos=1)
+#  graphics::text(x=0.63,y=0.5,labels="combine\npredicted\nprobabilities",col="darkgrey",cex=0.7)
+#  graphics::text(x=0.8,y=0.3,labels="transform\npredicted values to\npredicted probabilities",col="darkgrey",cex=0.7,pos=1)
 #  
 #  grDevices::dev.off()
 
@@ -61,14 +60,16 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #        y <- eta + epsilon + stats::rbinom(n=n,size=1,prob=0.05)*(2*stats::rbinom(n=n,size=1,prob=0.5)-1)*1.5*max(abs(eta))
 #      }
 #      foldid <- rep(c(0,1),times=c(n0,n1))
-#      loss[[i]][[j]] <- cornet::cv.cornet(y=y,cutoff=0,X=X,rf=TRUE,svm=TRUE,foldid.ext=foldid)
+#      loss[[i]][[j]] <- cornet::cv.cornet(y=y,cutoff=0,X=X,foldid.ext=foldid)
 #    }
 #  }
 #  
-#  save(loss,file="results/examples.RData")
+#  save(loss,file="results/simulation.RData")
+#  writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
+#          sessioninfo::session_info()),con="results/info_sim.txt")
 
 ## ----examples_figure----------------------------------------------------------
-#  load("results/examples.RData")
+#  load("results/simulation.RData")
 #  
 #  grDevices::pdf("manuscript/figure_EXA.pdf",width=5,height=5)
 #  

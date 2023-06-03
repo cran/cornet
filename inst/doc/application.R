@@ -1,7 +1,7 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #setwd("~/Desktop/cornet")
-#utils::install.packages(pkgs=c("devtools","missRanger","xtable"))
+#utils::install.packages(pkgs=c("devtools","missRanger","xtable","randomForest","MLmetrics"))
 #devtools::install_github("rauschenberger/cornet")
 
 ## ----process------------------------------------------------------------------
@@ -59,7 +59,7 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #        cond <- !is.na(y)
 #        set.seed(i)
 #        loss[[i]][[names[j]]] <- cornet::cv.cornet(y=y[cond],cutoff=25.5,
-#                                    X=x[[i]][cond,],alpha=alpha)
+#                                    X=x[[i]][cond,],alpha=alpha,rf=(alpha==1),xgboost=(alpha==1))
 #        set.seed(i)
 #        fit[[i]][[names[j]]] <- cornet::cornet(y=y[cond],cutoff=25.5,
 #                                    X=x[[i]][cond,],alpha=alpha)
@@ -75,10 +75,10 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  writeLines(text=capture.output(utils::sessionInfo(),cat("\n"),
 #          sessioninfo::session_info()),con="results/info_app.txt")
 
-## ----table_pool---------------------------------------------------------------
+## ----table_test---------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
 #  
-#  k <- "binomial"
+#  k <- "binomial" # compare: k <- "gaussian
 #  
 #  names <- c(paste0("lasso",1:3),paste0("ridge",1:3))
 #  frame <- data.frame(row.names=names)
@@ -130,11 +130,11 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  xtable <- xtable::xtable(frame,align="r|rrc|cc|ccc|ccc")
 #  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x,comment=FALSE)
 
-## ----table_other--------------------------------------------------------------
+## ----table_change-------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)
 #  
 #  names <- c(paste0("lasso",1:3),paste0("ridge",1:3))
-#  type <- c("deviance","class","mse","mae","auc")
+#  type <- c("deviance","class","mse","mae","auc","prauc")
 #  
 #  k <- "binomial"
 #  
@@ -150,12 +150,33 @@ knitr::opts_chunk$set(echo=TRUE,eval=FALSE)
 #  
 #  frame <- format(round(frame,digits=1))
 #  frame <- gsub(pattern=" ",replacement="+",x=frame)
-#  colnames(frame) <- sapply(colnames(frame),function(x) switch(x,class="\\textsc{mcr}",mse="\\textsc{mse}",mae="\\textsc{mae}",auc="\\textsc{auc}",x))
+#  colnames(frame) <- sapply(colnames(frame),function(x) switch(x,class="\\textsc{mcr}",mse="\\textsc{mse}",mae="\\textsc{mae}",auc="\\textsc{roc-auc}",prauc="\\textsc{pr-auc}",x))
 #  colnames(frame) <- paste0("$\\Delta$",colnames(frame))
 #  rownames(frame) <- paste0(substr(x=rownames(frame),start=1,stop=5)," ",
 #                            substr(x=rownames(frame),start=6,stop=6))
-#  xtable <- xtable::xtable(frame,align="r|ccccc")
+#  xtable <- xtable::xtable(frame,align="r|cccccc")
 #  xtable::print.xtable(xtable,include.rownames=TRUE,sanitize.text.function=function(x) x,comment=FALSE)
+
+## ----table_other--------------------------------------------------------------
+#  load("results/application.RData",verbose=TRUE)
+#  
+#  table <- numeric()
+#  for(i in 1:3){
+#    lasso <- apply(sapply(loss,function(x) x[[paste0("lasso",i)]]$deviance),1,median)
+#    names(lasso)[names(lasso)=="binomial"] <- "logistic lasso regression"
+#    names(lasso)[names(lasso)=="combined"] <- "combined lasso regression"
+#    ridge <- apply(sapply(loss,function(x) x[[paste0("ridge",i)]]$deviance),1,median)
+#    names(ridge)[names(ridge)=="binomial"] <- "logistic ridge regression"
+#    names(ridge)[names(ridge)=="combined"] <- "combined ridge regression"
+#    table <- cbind(table,c(lasso[c("logistic lasso regression","combined lasso regression")],ridge[c("logistic ridge regression","combined ridge regression")],lasso["rf"],lasso["xgboost"]))
+#    rownames(table)[rownames(table)=="rf"] <- "\\texttt{randomForest}"
+#    rownames(table)[rownames(table)=="xgboost"] <- "\\texttt{xgboost}"
+#  }
+#  colnames(table) <- paste("year",1:3)
+#  rownames(table) <- paste("\\footnotesize",rownames(table))
+#  xtable <- xtable::xtable(table)
+#  xtable::print.xtable(xtable,comment=FALSE,hline.after=c(0,2,4),sanitize.text.function=identity)
+#  
 
 ## ----figure_MAP---------------------------------------------------------------
 #  load("results/application.RData",verbose=TRUE)

@@ -694,8 +694,8 @@ predict.cornet <- function(object,newx,type="probability",...){
 #' comparison with random forest\strong{:}
 #' logical
 #' 
-#' @param svm
-#' comparison with support vector machine\strong{:}
+#' @param xgboost
+#' comparison with extreme gradient boosting\strong{:}
 #' logical
 #' 
 #' @param ... further arguments passed to
@@ -710,10 +710,14 @@ predict.cornet <- function(object,newx,type="probability",...){
 #' \dontrun{n <- 100; p <- 200
 #' y <- rnorm(n)
 #' X <- matrix(rnorm(n*p),nrow=n,ncol=p)
-#' loss <- cv.cornet(y=y,cutoff=0,X=X,rf=TRUE,svm=TRUE)
+#' start <- Sys.time()
+#' loss <- cv.cornet(y=y,cutoff=0,X=X)
+#' end <- Sys.time()
+#' end - start
+#' 
 #' loss}
 #' 
-cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=NULL,foldid.int=NULL,type.measure="deviance",rf=FALSE,svm=FALSE,...){
+cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=NULL,foldid.int=NULL,type.measure="deviance",rf=FALSE,xgboost=FALSE,...){
   
   if(rf){
     if(!"randomForest" %in% rownames(utils::installed.packages())){
@@ -721,9 +725,9 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
     }
   }
   
-  if(svm){
-    if(!"e1071" %in% rownames(utils::installed.packages())){
-      stop("Requires package 'e1071'.")
+  if(xgboost){
+    if(!"xgboost" %in% rownames(utils::installed.packages())){
+      stop("Requires package 'xgboost'.")
     }
   }
   
@@ -736,7 +740,7 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   
   #--- cross-validated loss ---
   
-  cols <- c("intercept","binomial","gaussian","combined","switch","rf"[rf],"svm"[svm])
+  cols <- c("intercept","binomial","gaussian","combined","switch","rf"[rf],"xgboost"[xgboost])
   pred <- matrix(data=NA,nrow=length(y),ncol=length(cols),
                  dimnames=list(NULL,cols))
   
@@ -757,20 +761,37 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
     tryCatch(expr=plot.cornet(fit),error=function(x) NULL)
     temp <- predict.cornet(fit,newx=X1)
     if(any(temp<0|temp>1)){stop("Outside unit interval.",call.=FALSE)}
-    model <- colnames(temp) # was "colnames(pred)"
+    model <- colnames(temp)
     for(j in seq_along(model)){
       pred[foldid.ext==i,model[j]] <- temp[[model[j]]]
     }
     
     if(rf){
-      object <- randomForest::randomForest(x=X0,y=as.factor(z0),norm.votes=TRUE)
+      object <- randomForest::randomForest(x=X0,y=as.factor(z0))
       pred[foldid.ext==i,"rf"] <- stats::predict(object,newdata=X1,type="prob")[,2]
     }
     
-    if(svm){
-      object <- e1071::svm(x=X0,y=as.factor(z0),probability=TRUE)
-      pred[foldid.ext==i,"svm"] <- attributes(stats::predict(object,newdata=X1,probability=TRUE))$probabilities[,2]
+    if(xgboost){
+      data0 <- xgboost::xgb.DMatrix(data=X0,label=z0)
+      xgb <- xgboost::xgboost(data=data0,objective="binary:logistic",nrounds=500,print_every_n=100) # max_depth=4,eta=0.2,nrounds=500,subsample=0.9,colsample_bytree=0.9)
+      data1 <- xgboost::xgb.DMatrix(data=X1)
+      pred[foldid.ext==i,"xgboost"] <- stats::predict(xgb,newdata=data1,type="prob")
     }
+    
+    # if(knn){
+    #   cvm <- numeric()
+    #   for(k in seq_len(length(z0)-1)){
+    #     temp  <- class::knn.cv(train=X0,cl=as.factor(z0),k=k)
+    #     cvm[k] <- mean(z0!=temp)
+    #   }
+    #   temp <- class::knn(train=X0,test=X1,cl=as.factor(z0),k=which.min(cvm),prob=TRUE)
+    #   pred[foldid.ext==i,"knn"] <- ifelse(temp==1,attributes(temp)$prob,1-attributes(temp)$prob)
+    # }
+    
+    # if(svm){
+    #   object <- e1071::best.svm(x=X0,y=as.factor(z0),probability=TRUE,gamma=2^seq(from=-1,to=1,by=0.5),cost=2^seq(from=-2,to=4,by=1))
+    #   pred[foldid.ext==i,"svm"] <- attributes(stats::predict(object,newdata=X1,probability=TRUE))$probabilities[,2]
+    # }
     
   }
   
@@ -778,6 +799,10 @@ cv.cornet <- function(y,cutoff,X,alpha=1,nfolds.ext=5,nfolds.int=10,foldid.ext=N
   loss <- lapply(X=type,FUN=function(x) palasso:::.loss(y=z[foldid.ext!=0],fit=pred[foldid.ext!=0,],family="binomial",type.measure=x,foldid=foldid.ext[foldid.ext!=0])[[1]])
   names(loss) <- type
   
+  if("MLmetrics" %in% utils::installed.packages()[,1]){
+    loss$prauc <- apply(pred[foldid.ext!=0,],2,function(x) MLmetrics::PRAUC(y_pred=x,y_true=z[foldid.ext!=0]))
+  }
+
   # if(FALSE){
   #   #--- deviance residuals --- (removed during revision)
   #   
