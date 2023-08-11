@@ -12,7 +12,7 @@
 
 
 
-<title>Lasso and ridge regression for dichotomised outcomes</title>
+<title>Article</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -235,18 +235,55 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Lasso and ridge regression for dichotomised
-outcomes</h1>
+<h1 class="title toc-ignore">Article</h1>
 
 
 
-<p>The <code>cornet</code> manuscript is in preparation. Click <a href="https://CRAN.R-project.org/package=cornet">here</a> for the R
-package.</p>
+<div id="title" class="section level1">
+<h1>Title</h1>
+<p><strong>Predicting dichotomised outcomes from high-dimensional data
+in biomedicine</strong></p>
+</div>
+<div id="authors" class="section level1">
+<h1>Authors</h1>
+<p><strong>Armin Rauschenberger</strong><span class="math inline">\(~^{1,a}\)</span> <a href="https://orcid.org/0000-0001-6498-4801"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAALVBMVEUAAACmzjmmzjmmzjmmzjmmzjn////0+ebj8MHe7bXT55y82mus0UWmzjmSwCmNJ4LqAAAABnRSTlMAIGC/z+8mlFLTAAAAaElEQVR42k2OsQmAMBRET3CAFG5gbWMv6CBpRT44knM4hU3ESl6bLs5gEUW7x3GPO0k1tJJUAQxS4S3B4VRiCejVcCU2gjosjtO2CyymdSHDOT/A/Eu63NnVZCuoBIBehQc43Df63rgBoFJNFnlCBV4AAAAASUVORK5CYII=" alt="AR" /></a></p>
+<p><strong>Enrico Glaab</strong><span class="math inline">\(~^{1}\)</span> <a href="https://orcid.org/0000-0003-3977-7469"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAALVBMVEUAAACmzjmmzjmmzjmmzjmmzjn////0+ebj8MHe7bXT55y82mus0UWmzjmSwCmNJ4LqAAAABnRSTlMAIGC/z+8mlFLTAAAAaElEQVR42k2OsQmAMBRET3CAFG5gbWMv6CBpRT44knM4hU3ESl6bLs5gEUW7x3GPO0k1tJJUAQxS4S3B4VRiCejVcCU2gjosjtO2CyymdSHDOT/A/Eu63NnVZCuoBIBehQc43Df63rgBoFJNFnlCBV4AAAAASUVORK5CYII=" alt="EG" /></a></p>
+<p><span class="math inline">\(^1\)</span>Luxembourg Centre for Systems
+Biomedicine (LCSB), University of Luxembourg, Esch-sur-Alzette,
+Luxembourg.</p>
+<p><span class="math inline">\(^{a}\)</span>To whom correspondence
+should be addressed.</p>
+</div>
+<div id="abstract" class="section level1">
+<h1>Abstract</h1>
+<p>In many biomedical applications, we are more interested in the
+predicted probability that a numerical outcome is above a threshold than
+in the predicted value of the outcome. For example, it might be known
+that antibody levels above a certain threshold provide immunity against
+a disease, or a threshold for a disease severity score might reflect
+conversion from the presymptomatic to the symptomatic disease stage.
+Accordingly, biomedical researchers often convert numerical to binary
+outcomes (loss of information) to conduct logistic regression
+(probabilistic interpretation). We address this bad statistical practice
+by modelling the binary outcome with logistic regression, modelling the
+numerical outcome with linear regression, transforming the predicted
+values from linear regression to predicted probabilities, and combining
+the predicted probabilities from logistic and linear regression.
+Analysing high-dimensional simulated and experimental data, namely
+clinical data for predicting cognitive impairment, we obtain
+significantly improved predictions of dichotomised outcomes. Thus, the
+proposed approach effectively combines binary with numerical outcomes to
+improve binary classification in high-dimensional settings. An
+implementation is available in the R package cornet on GitHub (<a href="https://github.com/rauschenberger/cornet" class="uri">https://github.com/rauschenberger/cornet</a>) and CRAN (<a href="https://CRAN.R-project.org/package=cornet" class="uri">https://CRAN.R-project.org/package=cornet</a>).</p>
 <div id="reference" class="section level2">
 <h2>Reference</h2>
 <p>Armin Rauschenberger and Enrico Glaab (2023). “Predicting artificial
-binary outcomes from high-dimensional data in biomedicine”.
-<em>Manuscript in preparation.</em></p>
+binary outcomes from high-dimensional data in biomedicine”. <em>Journal
+of Applied Statistics.</em> In press. <a href="https:/doi.org/10.1080/02664763.2023.2233057">doi:
+10.1080/02664763.2023.2233057</a></p>
+<iframe src="https://publications.uni.lu/bitstream/10993/55464/2/Predicting%20dichotomised%20outcomes%20from%20high%20dimensional%20data%20in%20biomedicine.pdf" width="100%" height="400px" data-external="1">
+</iframe>
+</div>
 </div>
 
 

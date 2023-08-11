@@ -354,12 +354,12 @@ original continuous outcome and the artificial binary outcome with
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>Install the current release from <a href="https://CRAN.R-project.org/package=cornet">CRAN</a>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cornet&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cornet&quot;</span>)</span></code></pre></div>
 <p>Or install the development version from <a href="https://github.com/rauschenberger/cornet">GitHub</a>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(&quot;devtools&quot;)</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rauschenberger/cornet&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rauschenberger/cornet&quot;</span>)</span></code></pre></div>
 <p>Then load and attach the package:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cornet)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(cornet)</span></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2>Example</h2>
@@ -371,32 +371,32 @@ The matrix <span class="math inline">\(\boldsymbol{X}\)</span> with
 the vector <span class="math inline">\(\boldsymbol{y}\)</span> of length
 <span class="math inline">\(n\)</span> represents the continuous
 outcome.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span>; p <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n<span class="sc">*</span>p),<span class="at">nrow=</span>n,<span class="at">ncol=</span>p)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="at">n=</span>p,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span><span class="fl">0.05</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n=</span>n,<span class="at">mean=</span>X<span class="sc">%*%</span>beta)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span>; p <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n<span class="sc">*</span>p),<span class="at">nrow=</span>n,<span class="at">ncol=</span>p)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="at">n=</span>p,<span class="at">size=</span><span class="dv">1</span>,<span class="at">prob=</span><span class="fl">0.05</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n=</span>n,<span class="at">mean=</span>X<span class="sc">%*%</span>beta)</span></code></pre></div>
 <p>We use the function <code>cornet</code> for modelling the original
 continuous outcome and the artificial binary outcome. The argument
 <code>cutoff</code> splits the samples into two groups, those with an
 outcome less than or equal to the cutoff, and those with an outcome
 greater than the cutoff.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cornet</span>(<span class="at">y=</span>y,<span class="at">cutoff=</span><span class="dv">0</span>,<span class="at">X=</span>X)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>model</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">cornet</span>(<span class="at">y=</span>y,<span class="at">cutoff=</span><span class="dv">0</span>,<span class="at">X=</span>X)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>model</span></code></pre></div>
 <p>The function <code>coef</code> returns the estimated coefficients.
 The first column is for the linear model (beta), and the second column
 is for the logistic model (gamma). The first row includes the estimated
 intercepts, and the other rows include the estimated slopes.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>coef <span class="ot">&lt;-</span> <span class="fu">coef</span>(model)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>coef <span class="ot">&lt;-</span> <span class="fu">coef</span>(model)</span></code></pre></div>
 <p>The function <code>predict</code> returns fitted values for training
 data, or predicted values for testing data. The argument
 <code>newx</code> specifies the feature matrix. The output is a matrix
 with one column for each model.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>predict <span class="ot">&lt;-</span> <span class="fu">predict</span>(model,<span class="at">newx=</span>X)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>predict <span class="ot">&lt;-</span> <span class="fu">predict</span>(model,<span class="at">newx=</span>X)</span></code></pre></div>
 <p>The function <code>cv.cornet</code> measures the predictive
 performance of combined regression by nested cross-validation, in
 comparison with logistic regression.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cv.cornet</span>(<span class="at">y=</span>y,<span class="at">cutoff=</span><span class="dv">0</span>,<span class="at">X=</span>X)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">cv.cornet</span>(<span class="at">y=</span>y,<span class="at">cutoff=</span><span class="dv">0</span>,<span class="at">X=</span>X)</span></code></pre></div>
 <p>Here we observe that combined regression outperforms logistic
 regression (lower logistic deviance), and that logistic regression is
 only slightly better than the intercept-only model.</p>
