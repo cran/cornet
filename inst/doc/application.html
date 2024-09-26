@@ -568,7 +568,7 @@ macOS Ventura 13.4).</p>
 It is possible to compare combined regression with ordinal regression by slightly modifying the function cv.cornet. Add the argument "ordinal = TRUE/FALSE" and two code chunks (see below). Such a comparison does not make much sense for ordinal response variables with many categories.
 
 
-```r
+``` r
 cv.cornet <- function (y, cutoff, X, alpha = 1, nfolds.ext = 5, nfolds.int = 10, foldid.ext = NULL, foldid.int = NULL, type.measure = "deviance", ordinal = FALSE,...) {
     z <- 1 * (y > cutoff)
     if (is.null(foldid.ext)) {

@@ -403,9 +403,10 @@ only slightly better than the intercept-only model.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Rauschenberger A, and Glaab E (2023). “Predicting artificial binary
-outcomes from high-dimensional data in biomedicine”. <em>Manuscript in
-preparation.</em></p>
+<p>Armin Rauschenberger <a href="https://orcid.org/0000-0001-6498-4801"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAALVBMVEUAAACmzjmmzjmmzjmmzjmmzjn////0+ebj8MHe7bXT55y82mus0UWmzjmSwCmNJ4LqAAAABnRSTlMAIGC/z+8mlFLTAAAAYElEQVR42m2PWw7AIAgEEdA+l/sft4Km1tj5IUwIsOSwoCJMjaToaIo+o5yGILtRDAElYgBmLm43TIKYKJW9KiF0Ybi2A8BH4CqT8Po7IfMOIZ6vcDw20Pb6S05ruCX+A9I+CQ+hA8ZPAAAAAElFTkSuQmCC" alt="AR" /></a> and Enrico Glaab <a href="https://orcid.org/0000-0003-3977-7469"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAALVBMVEUAAACmzjmmzjmmzjmmzjmmzjn////0+ebj8MHe7bXT55y82mus0UWmzjmSwCmNJ4LqAAAABnRSTlMAIGC/z+8mlFLTAAAAYElEQVR42m2PWw7AIAgEEdA+l/sft4Km1tj5IUwIsOSwoCJMjaToaIo+o5yGILtRDAElYgBmLm43TIKYKJW9KiF0Ybi2A8BH4CqT8Po7IfMOIZ6vcDw20Pb6S05ruCX+A9I+CQ+hA8ZPAAAAAElFTkSuQmCC" alt="EG" /></a> (2024). “Predicting dichotomised outcomes from
+high-dimensional data in biomedicine”. <em>Journal of Applied
+Statistics</em> 51(9):1756-1771. <a href="https://doi.org/10.1080/02664763.2023.2233057">doi:
+10.1080/02664763.2023.2233057</a></p>
 <!--
 # Example
 
@@ -420,7 +421,7 @@ The ordinal outcome $\boldsymbol{y}$ (MDS-UPDRS item 3.12, postural instability)
 We use the Bioconductor packages [`GEOquery`](https://doi.org/10.18129/B9.bioc.GEOquery) and [`Biobase`](https://doi.org/10.18129/B9.bioc.Biobase) for obtaining the data $(\approx 150$MB$)$:
 
 
-```r
+``` r
 #install.packages("BiocManager")
 #BiocManager::install(c("GEOquery","Biobase"))
 data <- GEOquery::getGEO(GEO="GSE80599")[[1]]
@@ -438,7 +439,7 @@ The vector $\boldsymbol{y}$ of length $n$ represents the outcome, and the matrix
 We test for marginal association between the ordinal outcome and the features. The smallest adjusted $p$-values is insignificant, and the $p$-value distribution is not right-skewed. There is probably not much signal in the data.
 
 
-```r
+``` r
 pvalue <- apply(X,2,function(x) cor.test(x,y)$p.value)
 min(p.adjust(pvalue))
 hist(pvalue)
@@ -447,7 +448,7 @@ hist(pvalue)
 We filter the features to artificially increase the signal-to-noise ratio. This filtering leads to *bias* and *overfitting*, and must not be done in practical applications!
 
 
-```r
+``` r
 cor <- abs(cor(y,X,method="spearman"))
 X <- X[,cor>0.3] # forbidden!
 ```
@@ -459,7 +460,7 @@ Pinho R, Guedes LC, Soreq L, Lobo PP, Mestre T, Coelho M, et al. (2016). "Gene E
 Rani et al. (2017): GSE97644
 
 
-```r
+``` r
 #install.packages("BiocManager")
 #BiocManager::install("GEOquery")
 files <- GEOquery::getGEOSuppFiles("GSE97644")
@@ -472,7 +473,7 @@ X <- cbind(gender,age,geno)
 ```
 
 
-```r
+``` r
 net <- cornet::cornet(y=y,cutoff=25,X=X)
 set.seed(1)
 cornet:::cv.cornet(y=y,cutoff=25,X=X)
@@ -481,14 +482,14 @@ cornet:::cv.cornet(y=y,cutoff=25,X=X)
 # Other
 
 
-```r
+``` r
 files <- GEOquery::getGEOSuppFiles("GSE95640")
 X <- t(read.csv(textConnection(readLines(rownames(files)[1])),row.names=1))
 y <- GEOquery::getGEO(GEO="GSE95640")[[1]] # no numeric outcome
 ```
 
 
-```r
+``` r
 data <- GEOquery::getGEO(GEO="GSE109597")[[1]]
 y <- as.numeric(Biobase::pData(data)$"bmi:ch1")
 X <- t(Biobase::exprs(data))
@@ -505,7 +506,7 @@ $(\hat{\beta}_j$ and $\hat{\gamma}_j$ $\forall j \in \{1,\ldots,p\})$
 
 ### Example ###
 
-```r
+``` r
 #install.packages("BiocManager")
 #BiocManager::install("mixOmics")
 set.seed(1)
